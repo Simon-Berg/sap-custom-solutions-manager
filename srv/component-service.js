@@ -331,3 +331,5 @@ class ComponentsService extends cds.ApplicationService {
 }
 
 module.exports = ComponentsService;
+
+// Testing trufflehog action
