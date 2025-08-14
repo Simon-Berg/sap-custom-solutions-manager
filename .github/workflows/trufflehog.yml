@@ -21,7 +21,9 @@ jobs:
     - name: scan-push
       uses: trufflesecurity/trufflehog@main
       with:
-        base: "34f3c4ee626fbcbdc17356a431dbdb2c7997f7c4"
+        # base: "34f3c4ee626fbcbdc17356a431dbdb2c7997f7c4"
+        path: ./
+        base: ${{ steps.root.outputs.root }}
         head: ${{ github.ref_name }}
         extra_args: --results=verified,unknown
 # on:
