@@ -7,25 +7,36 @@ on:
   pull_request:
 
 jobs:
-  test:
+  trufflehog:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - name: Secret Scanning
-      uses: trufflesecurity/trufflehog@main
-      with:
-        extra_args: --results=verified,unknown
-    - name: scan-push
-      uses: trufflesecurity/trufflehog@main
-      with:
-        # base: "34f3c4ee626fbcbdc17356a431dbdb2c7997f7c4"
-        path: ./
-        base: ${{ steps.root.outputs.root }}
-        head: ${{ github.ref_name }}
-        extra_args: --results=verified,unknown
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # NEW: find the root commit and expose it as an output
+      - name: Find root commit
+        id: root
+        run: |
+          ROOT=$(git rev-list --max-parents=0 HEAD | tail -n1)
+          echo "root=$ROOT" >> "$GITHUB_OUTPUT"
+
+      # OPTIONAL: sanity check so you can see it in the logs
+      - name: Show root commit
+        run: echo "Root is ${{ steps.root.outputs.root }}"
+      - name: Secret Scanning
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --results=verified,unknown
+      - name: scan-push
+        uses: trufflesecurity/trufflehog@main
+        with:
+          # base: "34f3c4ee626fbcbdc17356a431dbdb2c7997f7c4"
+          path: ./
+          base: ${{ steps.root.outputs.root }}
+          head: ${{ github.ref_name }}
+          extra_args: --results=verified,unknown
 # on:
 #   pull_request:
 #   push:
